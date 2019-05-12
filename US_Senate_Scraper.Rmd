@@ -1,0 +1,722 @@
+---
+title: "US Senate Scraper"
+author: "ODONNELL"
+date: "April 27, 2019"
+output: html_document
+---
+
+## The overall goal of this R file is to create a
+## dataframe with a row for each year of every
+## US senators 
+
+## Then, we can easily aggregate senator information
+## by year
+
+## First, load the needed packages:
+
+```{r eval=TRUE, warning=FALSE, message=FALSE}
+# first, for scraping
+library(rvest)
+library(RCurl)
+
+# second, for tidying
+library(tidyr)
+library(dplyr)
+```
+
+
+## Next, scrape the needed Wikipedia tables
+## 25 tables, one for each letter (no 'X')
+
+```{r warning=FALSE}
+#wikipedia page with all senators
+page <- "https://en.wikipedia.org/wiki/List_of_former_United_States_Senators"
+
+#collect the senators
+senators.a <- page %>% 
+    html() %>%
+    html_nodes(xpath = '//*[@id="mw-content-text"]/div/table[3]') %>%
+    html_table()
+
+senators.b <- page %>% 
+    html() %>%
+    html_nodes(xpath = '//*[@id="mw-content-text"]/div/table[4]') %>%
+    html_table()
+
+senators.c <- page %>% 
+    html() %>%
+    html_nodes(xpath = '//*[@id="mw-content-text"]/div/table[5]') %>%
+    html_table()
+
+senators.d <- page %>% 
+    html() %>%
+    html_nodes(xpath = '//*[@id="mw-content-text"]/div/table[6]') %>%
+    html_table()
+
+senators.e <- page %>% 
+    html() %>%
+    html_nodes(xpath = '//*[@id="mw-content-text"]/div/table[7]') %>%
+    html_table()
+
+senators.f <- page %>% 
+    html() %>%
+    html_nodes(xpath = '//*[@id="mw-content-text"]/div/table[8]') %>%
+    html_table()
+
+senators.g <- page %>% 
+    html() %>%
+    html_nodes(xpath = '//*[@id="mw-content-text"]/div/table[9]') %>%
+    html_table()
+
+senators.h <- page %>% 
+    html() %>%
+    html_nodes(xpath = '//*[@id="mw-content-text"]/div/table[10]') %>%
+    html_table()
+
+senators.i <- page %>% 
+    html() %>%
+    html_nodes(xpath = '//*[@id="mw-content-text"]/div/table[11]') %>%
+    html_table()
+
+senators.j <- page %>% 
+    html() %>%
+    html_nodes(xpath = '//*[@id="mw-content-text"]/div/table[12]') %>%
+    html_table()
+
+senators.k <- page %>% 
+    html() %>%
+    html_nodes(xpath = '//*[@id="mw-content-text"]/div/table[13]') %>%
+    html_table()
+
+senators.l <- page %>% 
+    html() %>%
+    html_nodes(xpath = '//*[@id="mw-content-text"]/div/table[14]') %>%
+    html_table()
+
+senators.m <- page %>% 
+    html() %>%
+    html_nodes(xpath = '//*[@id="mw-content-text"]/div/table[15]') %>%
+    html_table()
+
+senators.n <- page %>% 
+    html() %>%
+    html_nodes(xpath = '//*[@id="mw-content-text"]/div/table[16]') %>%
+    html_table()
+
+senators.o <- page %>% 
+    html() %>%
+    html_nodes(xpath = '//*[@id="mw-content-text"]/div/table[17]') %>%
+    html_table()
+
+senators.p <- page %>% 
+    html() %>%
+    html_nodes(xpath = '//*[@id="mw-content-text"]/div/table[18]') %>%
+    html_table()
+
+senators.q <- page %>% 
+    html() %>%
+    html_nodes(xpath = '//*[@id="mw-content-text"]/div/table[19]') %>%
+    html_table()
+
+senators.r <- page %>% 
+    html() %>%
+    html_nodes(xpath = '//*[@id="mw-content-text"]/div/table[20]') %>%
+    html_table()
+
+senators.s <- page %>% 
+    html() %>%
+    html_nodes(xpath = '//*[@id="mw-content-text"]/div/table[21]') %>%
+    html_table()
+
+senators.t <- page %>% 
+    html() %>%
+    html_nodes(xpath = '//*[@id="mw-content-text"]/div/table[22]') %>%
+    html_table()
+
+senators.u <- page %>% 
+    html() %>%
+    html_nodes(xpath = '//*[@id="mw-content-text"]/div/table[23]') %>%
+    html_table()
+
+senators.v <- page %>% 
+    html() %>%
+    html_nodes(xpath = '//*[@id="mw-content-text"]/div/table[24]') %>%
+    html_table()
+
+senators.w <- page %>% 
+    html() %>%
+    html_nodes(xpath = '//*[@id="mw-content-text"]/div/table[25]') %>%
+    html_table()
+
+senators.y <- page %>% 
+    html() %>%
+    html_nodes(xpath = '//*[@id="mw-content-text"]/div/table[26]') %>%
+    html_table()
+
+senators.z <- page %>% 
+    html() %>%
+    html_nodes(xpath = '//*[@id="mw-content-text"]/div/table[27]') %>%
+    html_table()
+```
+
+### Third, drop the unneeded 'Class' column
+### ..this column name does not match among tables
+
+```{r eval=TRUE}
+senators.a[[1]] = senators.a[[1]][,-3]
+senators.b[[1]] = senators.b[[1]][,-3]
+senators.c[[1]] = senators.c[[1]][,-3]
+senators.d[[1]] = senators.d[[1]][,-3]
+senators.e[[1]] = senators.e[[1]][,-3]
+senators.f[[1]] = senators.f[[1]][,-3]
+senators.g[[1]] = senators.g[[1]][,-3]
+senators.h[[1]] = senators.h[[1]][,-3]
+senators.i[[1]] = senators.i[[1]][,-3]
+senators.j[[1]] = senators.j[[1]][,-3]
+senators.k[[1]] = senators.k[[1]][,-3]
+senators.l[[1]] = senators.l[[1]][,-3]
+senators.m[[1]] = senators.m[[1]][,-3]
+senators.n[[1]] = senators.n[[1]][,-3]
+senators.o[[1]] = senators.o[[1]][,-3]
+senators.p[[1]] = senators.p[[1]][,-3]
+senators.q[[1]] = senators.q[[1]][,-3]
+senators.r[[1]] = senators.r[[1]][,-3]
+senators.s[[1]] = senators.s[[1]][,-3]
+senators.t[[1]] = senators.t[[1]][,-3]
+senators.u[[1]] = senators.u[[1]][,-3]
+senators.v[[1]] = senators.v[[1]][,-3]
+senators.w[[1]] = senators.w[[1]][,-3]
+senators.y[[1]] = senators.y[[1]][,-3]
+senators.z[[1]] = senators.z[[1]][,-3]
+```
+
+
+### Next, bind the scraped lists into a single dataframe
+
+```{r eval=TRUE}
+#rbind is easiest solution for this..
+us.senators <- rbind(senators.a[[1]],
+                     senators.b[[1]],
+                     senators.c[[1]],
+                     senators.d[[1]],
+                     senators.e[[1]],
+                     senators.f[[1]],
+                     senators.g[[1]],
+                     senators.h[[1]],
+                     senators.i[[1]],
+                     senators.j[[1]],
+                     senators.k[[1]],
+                     senators.l[[1]],
+                     senators.m[[1]],
+                     senators.n[[1]],
+                     senators.o[[1]],
+                     senators.p[[1]],
+                     senators.q[[1]],
+                     senators.r[[1]],
+                     senators.s[[1]],
+                     senators.t[[1]],
+                     senators.u[[1]],
+                     senators.v[[1]],
+                     senators.w[[1]],
+                     senators.y[[1]],
+                     senators.z[[1]])
+
+
+head(us.senators)
+```
+
+## Now, fix the one row that is formatted
+## differently than all the others (row 1112)
+
+```{r}
+
+us.senators[1112,2]
+us.senators[1112,2] <- '2005-2009'
+us.senators[1112,2]
+
+#for (i in 1:1889){
+#  str_replace(us.senators$Years[[i]], '2005-2009', '2005-2009')
+#}
+```
+
+
+# OK, the current dataframe has all of our wanted
+# information but it is not clean nor tidy..
+
+## So, let's tidy some the data for aggregation
+
+```{r}
+# first, import the stringr package
+library(stringr)
+
+# Some senators had gaps of time between their
+# stints in the senate. Thus, we must first break
+# their time in the senate into time spans:
+
+# added difficulty: some senators took over mid-term..
+
+
+# So, in the following loops we are breaking the Year
+# column into multiple columns for each set of years a Senator was
+# in office. A senator may have multiple sets of years for two reasons:
+# 1. they switched parties
+# 2. they had a gap from their time in the senate
+
+for (i in 1:1889){
+  if (str_sub(us.senators$Years[[i]], 5, 5) == '-'){
+    us.senators$first.years[[i]] <- str_sub(us.senators$Years[[i]], 1, 9)
+    us.senators$Years[[i]] <- str_sub(us.senators$Years[[i]], 10, str_length(us.senators$Years[[i]]))
+  } else {
+    us.senators$first.years[[i]] <- str_sub(us.senators$Years[[i]], 1, 4)
+    us.senators$Years[[i]] <- str_sub(us.senators$Years[[i]], 5, str_length(us.senators$Years[[i]]))
+  }
+}
+
+for (i in 1:1889){
+  if (str_sub(us.senators$Years[[i]], 5, 5) == '-'){
+    us.senators$second.years[[i]] <- str_sub(us.senators$Years[[i]], 1, 9)
+    us.senators$Years[[i]] <- str_sub(us.senators$Years[[i]], 10, str_length(us.senators$Years[[i]]))
+  } else {
+    us.senators$second.years[[i]] <- str_sub(us.senators$Years[[i]], 1, 4)
+    us.senators$Years[[i]] <- str_sub(us.senators$Years[[i]], 5, str_length(us.senators$Years[[i]]))
+  }
+}
+
+for (i in 1:1889){
+  if (str_sub(us.senators$Years[[i]], 5, 5) == '-'){
+    us.senators$third.years[[i]] <- str_sub(us.senators$Years[[i]], 1, 9)
+    us.senators$Years[[i]] <- str_sub(us.senators$Years[[i]], 10, str_length(us.senators$Years[[i]]))
+  } else {
+    us.senators$third.years[[i]] <- str_sub(us.senators$Years[[i]], 1, 4)
+    us.senators$Years[[i]] <- str_sub(us.senators$Years[[i]], 5, str_length(us.senators$Years[[i]]))
+  }
+}
+
+for (i in 1:1889){
+  if (str_sub(us.senators$Years[[i]], 5, 5) == '-'){
+    us.senators$fourth.years[[i]] <- str_sub(us.senators$Years[[i]], 1, 9)
+    us.senators$Years[[i]] <- str_sub(us.senators$Years[[i]], 10, str_length(us.senators$Years[[i]]))
+  } else {
+    us.senators$fourth.years[[i]] <- str_sub(us.senators$Years[[i]], 1, 4)
+    us.senators$Years[[i]] <- str_sub(us.senators$Years[[i]], 5, str_length(us.senators$Years[[i]]))
+  }
+}
+
+for (i in 1:1889){
+  if (str_sub(us.senators$Years[[i]], 5, 5) == '-'){
+    us.senators$fifth.years[[i]] <- str_sub(us.senators$Years[[i]], 1, 9)
+    us.senators$Years[[i]] <- str_sub(us.senators$Years[[i]], 10, str_length(us.senators$Years[[i]]))
+  } else {
+    us.senators$fifth.years[[i]] <- str_sub(us.senators$Years[[i]], 1, 4)
+    us.senators$Years[[i]] <- str_sub(us.senators$Years[[i]], 5, str_length(us.senators$Years[[i]]))
+  }
+}
+```
+
+### This following chunk is simple, it's filling
+### the empty (new) columns with zero's
+```{r}
+# Now, to fill in all the blank cells with zero's
+for (i in 7:10){
+  for (j in 1:1889){
+    if (us.senators[j, i] == ""){
+      us.senators[j,i] <- 0
+    }
+  }
+}
+```
+
+
+## Now, we'll start our long process to identify the specific
+## years each senator was in office, not just the ranges
+
+```{r}
+# Split each set of years into two columns
+
+us.senators$first.years.first <- str_sub(us.senators$first.years, 1, 4)
+us.senators$first.years.last <- str_sub(us.senators$first.years, 6, 10)
+
+us.senators$second.years.first <- str_sub(us.senators$second.years, 1, 4)
+us.senators$second.years.last <- str_sub(us.senators$second.years, 6, 10)
+
+us.senators$third.years.first <- str_sub(us.senators$third.years, 1, 4)
+us.senators$third.years.last <- str_sub(us.senators$third.years, 6, 10)
+
+us.senators$fourth.years.first <- str_sub(us.senators$fourth.years, 1, 4)
+us.senators$fourth.years.last <- str_sub(us.senators$fourth.years, 6, 10)
+
+us.senators$fifth.years.first <- str_sub(us.senators$fifth.years, 1, 4)
+us.senators$fifth.years.last <- str_sub(us.senators$fifth.years, 6, 10)
+
+# again, fill in the blank cells with zero's
+
+for (i in 11:20){
+  for (j in 1:1889){
+    if (us.senators[j, i] == ""){
+      us.senators[j,i] <- 0
+    } else {
+      us.senators[j,i] <- as.numeric(us.senators[j,i])
+    }
+  }
+}
+
+for (i in 11:20){
+  for (j in 1:1889){
+    us.senators[j,i] <- as.numeric(us.senators[j,i])
+  }
+}
+```
+
+us.senators[100,11]
+
+```{r warning=FALSE}
+# create lists of years, ranges, for each
+# set of years a senator was in office
+
+# this is all still to achieve a goal of
+# one row for each year a senator was in office
+
+# the hard part is each row much correspond
+# to the political party they were part of at
+# that time..
+
+us.senators$first.years.range <- list(0)
+us.senators$second.years.range <- list(0)
+us.senators$third.years.range <- list(0)
+us.senators$fourth.years.range <- list(0)
+us.senators$fifth.years.range <- list(0)
+
+for (i in 1:1889){
+  if (us.senators$first.years.first[[i]] != 0 &
+    us.senators$first.years.last[[i]] != 0) {
+    us.senators$first.years.range[[i]] <- seq(us.senators$first.years.first[[i]],
+                                              as.numeric(us.senators$first.years.last[[i]])-1, by=1)
+  } else {
+    us.senators$first.years.range[[i]] <- list(us.senators$first.years.first[[i]])
+  }
+}
+
+for (i in 1:1889){
+  if (us.senators$second.years.first[[i]] != 0 &
+    us.senators$second.years.last[[i]] != 0) {
+    us.senators$second.years.range[[i]] <- seq(us.senators$second.years.first[[i]],
+                                              as.numeric(us.senators$second.years.last[[i]])-1, by=1)
+  } else {
+    us.senators$second.years.range[[i]] <- list(us.senators$second.years.first[[i]])
+  }
+}
+
+for (i in 1:1889){
+  if (us.senators$third.years.first[[i]] != 0 &
+    us.senators$third.years.last[[i]] != 0) {
+    us.senators$third.years.range[[i]] <- seq(us.senators$third.years.first[[i]],
+                                              as.numeric(us.senators$third.years.last[[i]])-1, by=1)
+  } else {
+    us.senators$third.years.range[[i]] <- list(us.senators$third.years.first[[i]])
+  }
+}
+
+for (i in 1:1889){
+  if (us.senators$fourth.years.first[[i]] != 0 &
+    us.senators$fourth.years.last[[i]] != 0) {
+    us.senators$fourth.years.range[[i]] <- seq(us.senators$fourth.years.first[[i]],
+                                              as.numeric(us.senators$fourth.years.last[[i]])-1, by=1)
+  } else {
+    us.senators$fourth.years.range[[i]] <- list(us.senators$fourth.years.first[[i]])
+  }
+}
+
+for (i in 1:1889){
+  if (us.senators$fifth.years.first[[i]] != 0 &
+    us.senators$fifth.years.last[[i]] != 0) {
+    us.senators$fifth.years.range[[i]] <- seq(us.senators$fifth.years.first[[i]],
+                                              as.numeric(us.senators$fifth.years.last[[i]])-1, by=1)
+  } else {
+    us.senators$fifth.years.range[[i]] <- list(us.senators$fifth.years.first[[i]])
+  }
+}
+```
+
+## From the above few chunks we sucessfully split the original messy
+## Year column into lists of years each senator was in office
+
+## Now, we must tie each year a senators was in office to the political
+## party they represented during that year
+
+```{r warning=FALSE}
+# Now an additional challenge, some senators served
+# their time in senate under multiple political parties.
+# To address this, let's split each senators time in
+# office by their political party
+
+# first, create a list of all the parties
+
+pol.parties <- paste(c("Democratic-Republican",
+                      "Federalist", "Whig", "National Republican",
+                      "Populist", "Liberal Republican", "Unionist",
+                      "Farmer-Laborite", "Free Soiler", "Readjuster",
+                      "Independant", "Progressive", "Silver Republican",
+                      "American", "Anti-Monopolist", "Conservative", "Independent",
+                      "Nullifier", "Independant Democrat", "Independence",
+                      "Law and Order", "Liberty", "Oppositionist", "Silverite",
+                      "Unconditional Unionist", "Democratic", "Republican", '"'), collapse = "|")
+
+us.senators$political.parties <- str_extract_all(us.senators$Party, pol.parties)
+
+for (i in 1:1889){
+  us.senators$first.party[[i]] <- us.senators$political.parties[[i]][1]
+  us.senators$second.party[[i]] <- us.senators$political.parties[[i]][2]
+  us.senators$third.party[[i]] <- us.senators$political.parties[[i]][3]
+  us.senators$fourth.party[[i]] <- us.senators$political.parties[[i]][4]
+  us.senators$fifth.party[[i]] <- us.senators$political.parties[[i]][5]
+}
+
+
+# But as you may notice, wikipedia used " to show the same political
+# party as the previous set of years. Thus, we need to change all the
+# cells that have "
+
+for (i in 1:1889){
+  if (!is.na(us.senators$second.party[[i]]) & us.senators$second.party[[i]] == '\"'){
+    us.senators$second.party[[i]] <- us.senators$first.party[[i]]
+  } else {}
+}
+
+for (i in 1:1889){
+  if (!is.na(us.senators$third.party[[i]]) &
+      us.senators$third.party[[i]] == '\"' &
+      us.senators$second.party[[i]] != '\"'){
+    us.senators$third.party[[i]] <- us.senators$second.party[[i]]
+  } else if (!is.na(us.senators$third.party[[i]]) &
+      us.senators$third.party[[i]] == '\"' &
+      us.senators$second.party[[i]] == '\"'){
+    us.senators$third.party[[i]] <- us.senators$first.party[[i]]
+  }
+}
+
+for (i in 1:1889){
+  if (!is.na(us.senators$fourth.party[[i]]) &
+      us.senators$fourth.party[[i]] == '\"' &
+      us.senators$third.party[[i]] != '\"'){
+    us.senators$fourth.party[[i]] <- us.senators$third.party[[i]]
+  } else if (!is.na(us.senators$fourth.party[[i]]) &
+      us.senators$fourth.party[[i]] == '\"' &
+      us.senators$third.party[[i]] == '\"'){
+    us.senators$fourth.party[[i]] <- us.senators$second.party[[i]]
+  }
+}
+
+for (i in 1:1889){
+  if (!is.na(us.senators$fifth.party[[i]]) &
+      us.senators$fifth.party[[i]] == '\"' &
+      us.senators$fourth.party[[i]] != '\"'){
+    us.senators$fifth.party[[i]] <- us.senators$fourth.party[[i]]
+  } else if (!is.na(us.senators$fifth.party[[i]]) &
+      us.senators$fifth.party[[i]] == '\"' &
+      us.senators$fourth.party[[i]] == '\"'){
+    us.senators$fifth.party[[i]] <- us.senators$third.party[[i]]
+  }
+}
+
+
+```
+
+```{r warning=FALSE}
+# one catch, if a senator has two seperate ranges of years,
+# but, they did not switch parties, we have elminiated their
+# party in the second range. to adjust that:
+
+for (i in 1:1889){
+  if (length(us.senators$second.years.range[[i]])>1 &
+      (us.senators$second.years.range[[i]][1])!= "0" &
+      is.na(us.senators$second.party) == TRUE) {
+    us.senators$second.party[[i]] <- us.senators$first.party[[i]]
+  }
+}
+```
+
+
+## Finally, we have all the information we need!
+## So, let's delete the unneccsary columns
+
+```{r}
+library(dplyr)
+
+us.senators <- select(us.senators, -c(2, 5, 6, 7, 8,
+                                      9, 10, 11, 12,
+                                      13, 14, 15, 16,
+                                      17, 18, 19, 20))
+```
+
+
+# One last thing: we need to add all the current senators!
+# In our dataframe now, we only have previous senators
+```{r}
+add.current.senators <- read_csv("data/add_current_senators.csv")
+head(add.current.senators)
+```
+
+### format the current sentaors to merge with us.senators dataframe
+
+```{r}
+add.current.senators$first.years.range.end <- 2019
+add.current.senators$first.years.range <- as.numeric(add.current.senators$first.years.range)
+add.current.senators$first.years.range.two <- list(0)
+
+for (i in 1:100){
+  add.current.senators$first.years.range.two[[i]] <- seq(add.current.senators$first.years.range[[i]],
+                                              add.current.senators$first.years.range.end[[i]],
+                                              by=1)
+}
+
+add.current.senators$first.years.range <- add.current.senators$first.years.range.two
+
+for (i in 1:100){
+  add.current.senators$second.years.range[[i]] <- list(0)
+  add.current.senators$third.years.range[[i]] <- list(0)
+  add.current.senators$fourth.years.range[[i]] <- list(0)
+  add.current.senators$fifth.years.range[[i]] <- list(0) 
+}
+
+
+add.current.senators <- select(add.current.senators, -c(15,16))
+
+names(add.current.senators)
+```
+
+# add the current senators into the dataframe with all previous senators
+
+```{r}
+us.senators.final <- rbind(us.senators, add.current.senators)
+```
+
+
+
+## To tranform the dataframe to have one row for each
+## year per senator
+
+```{r warning=FALSE}
+senator.by.year <- data.frame("Senator" = 0, "Year" = 0, "State" = 0, "Party"= 0)
+
+# Summary: the following loop creates a single row entry
+# for each year of each senator's time in office
+
+for (i in 1:1989){
+  for (j in 1:length(us.senators.final$first.years.range[[i]])){
+    #print(us.senators$Senator[[i]])
+    #print(us.senators$first.years.range[[i]][[j]])
+    #print(us.senators$State[[i]])
+    #print(us.senators$Party[[i]])
+    nextrow = list(us.senators.final$Senator[[i]],
+                   us.senators.final$first.years.range[[i]][[j]],
+                   us.senators.final$State[[i]],
+                   us.senators.final$first.party[[i]])
+    senator.by.year <- rbind(senator.by.year, nextrow)
+  }
+}
+
+# drop the first row, it was merely a test
+senator.by.year <- senator.by.year[-1,]
+
+```
+
+```{r warning=FALSE}
+# run the same loop for the second set of years
+for (i in 1:1989){
+  for (j in 1:length(us.senators.final$second.years.range[[i]])){
+    if (us.senators.final$second.years.range[[i]] > 0){
+      nextrow = list(us.senators.final$Senator[[i]],
+                     us.senators.final$second.years.range[[i]][[j]],
+                     us.senators.final$State[[i]],
+                     us.senators.final$second.party[[i]])
+      senator.by.year <- rbind(senator.by.year, nextrow)
+    }
+  }
+}
+```
+
+```{r warning=FALSE}
+# run the same loop for the third set of years
+for (i in 1:1989){
+  for (j in 1:length(us.senators.final$third.years.range[[i]])){
+    if (us.senators.final$third.years.range[[i]] > 0){
+      nextrow = list(us.senators.final$Senator[[i]],
+                     us.senators.final$third.years.range[[i]][[j]],
+                     us.senators.final$State[[i]],
+                     us.senators.final$third.party[[i]])
+      senator.by.year <- rbind(senator.by.year, nextrow)
+    }
+  }
+} 
+```
+
+```{r warning=FALSE}
+# run the same loop for the fourth set of years
+for (i in 1:1989){
+  for (j in 1:length(us.senators.final$fourth.years.range[[i]])){
+    if (us.senators.final$fourth.years.range[[i]] > 0){
+      nextrow = list(us.senators.final$Senator[[i]],
+                     us.senators.final$fourth.years.range[[i]][[j]],
+                     us.senators.final$State[[i]],
+                     us.senators.final$fourth.party[[i]])
+      senator.by.year <- rbind(senator.by.year, nextrow)
+    }
+  }
+} 
+
+```
+
+```{r warning=FALSE}
+# run the same loop for the fifth set of years
+for (i in 1:1989){
+  for (j in 1:length(us.senators.final$fifth.years.range[[i]])){
+    if (us.senators.final$fifth.years.range[[i]] > 0){
+      nextrow = list(us.senators.final$Senator[[i]],
+                     us.senators.final$fifth.years.range[[i]][[j]],
+                     us.senators.final$State[[i]],
+                     us.senators.final$fifth.party[[i]])
+      senator.by.year <- rbind(senator.by.year, nextrow)
+    }
+  }
+} 
+```
+
+
+# Ok, over 600 lines of code to organize the senate data!
+## Now, let's do some quick checks on the data
+
+```{r}
+library(tidyr)
+
+senator.by.year %>%
+  group_by(Year) %>%
+  summarise(Count = n()) %>%
+  arrange(desc(Year))
+```
+
+```{r}
+write.csv(senator.by.year, "Senator_by_year.csv")
+
+us.senators.final <- select(us.senators.final, c(1, 2, 10))
+write.csv(us.senators.final, "All_Senators.csv")
+```
+
+```{r}
+us.senators.final %>%
+  group_by(first.party) %>%
+  summarise(Count = n()) %>%
+  arrange(desc(Count))
+```
+```{r}
+senator.by.year %>%
+  group_by(Party) %>%
+  summarise(Count = n()) %>%
+  arrange(desc(Count))
+```
+
+```{r warning=FALSE}
+filter(senator.by.year, State == "Georgia") %>%
+  group_by(Party) %>%
+  summarise(Count = n()) %>%
+  arrange(desc(Count))
+```

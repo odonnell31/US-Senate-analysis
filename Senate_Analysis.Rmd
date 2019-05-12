@@ -1,0 +1,203 @@
+---
+title: "US Senate Analysis"
+author: "ODONNELL"
+date: "May 7, 2019"
+output: html_document
+---
+
+# First, load the data
+```{r warning=FALSE}
+senators.year <- read.csv("Senator_by_year.csv")
+senators.all <- read.csv("All_Senators.csv")
+senators.current <- read.csv("data/all_current_senators.csv")
+```
+
+## Load packages
+```{r}
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(stringr)
+
+```
+
+
+## print the number of total senators
+```{r}
+print(nrow(senators.all))
+```
+
+## print longest serving senators
+```{r}
+senators.year %>%
+  group_by(Senator, Party, State) %>%
+  summarise(Count = n()) %>%
+  arrange(desc(Count))
+```
+
+## average years of a Senate career:
+```{r}
+avg_career <- data.frame(count(senators.year$Senator))
+
+mean(avg_career$freq)
+```
+
+## count of elected Senators by Political Party:
+```{r}
+senators.all %>%
+  group_by(first.party) %>%
+  summarise(Count = n()) %>%
+  arrange(desc(Count))
+```
+
+# US Senate by Federal Region
+### https://en.wikipedia.org/wiki/List_of_regions_of_the_United_States
+
+```{r}
+senators.year$federal.region <- 0
+
+for (i in 1:nrow(senators.year)){
+  if (senators.year$State[[i]] %in% c("Connecticut", "Maine", "Massachusetts", "New Hampshire", "Rhode Island", "Vermont")){
+    senators.year$federal.region[[i]] <- 1
+  }
+  else if (senators.year$State[[i]] %in% c("New Jersey", "New York")){
+    senators.year$federal.region[[i]] <- 2
+  }
+  else if (senators.year$State[[i]] %in% c("Delaware", "District of Columbia", "Maryland", "Pennsylvania", "Virginia", "West Virginia")){
+    senators.year$federal.region[[i]] <- 3
+  }
+  else if (senators.year$State[[i]] %in% c("Alabama", "Florida", "Georgia", "Kentucky", "Mississippi", "North Carolina", "South Carolina", "Tennessee")){
+    senators.year$federal.region[[i]] <- 4
+  }
+  else if (senators.year$State[[i]] %in% c("Illinois", "Indiana", "Michigan", "Minnesota", "Ohio", "Wisconsin")){
+    senators.year$federal.region[[i]] <- 5
+  }
+  else if (senators.year$State[[i]] %in% c("Arkansas", "Louisiana", "New Mexico", "Oklahoma", "Texas")){
+    senators.year$federal.region[[i]] <- 6
+  }
+  else if (senators.year$State[[i]] %in% c("Iowa", "Kansas", "Missouri", "Nebraska")){
+    senators.year$federal.region[[i]] <- 7
+  }
+  else if (senators.year$State[[i]] %in% c("Colorado", "Montana", "North Dakota", "South Dakota", "Utah", "Wyoming")){
+    senators.year$federal.region[[i]] <- 8
+  }
+  else if (senators.year$State[[i]] %in% c("Arizona", "California", "Hawaii", "Nevada")){
+    senators.year$federal.region[[i]] <- 9
+  }
+  else if (senators.year$State[[i]] %in% c("Alaska", "Idaho", "Oregon", "Washington")){
+    senators.year$federal.region[[i]] <- 10
+  }
+}
+```
+
+# US Senate by Federal Region 1789-1850
+```{r warning=FALSE}
+fed.region.first <- (senators.year %>%
+  filter(Year %in% (1789:1850)) %>%
+  group_by(federal.region, Party) %>%
+  summarise(Count = n()) %>%
+  arrange((federal.region), desc(Count)))
+
+fed.region.second <- (senators.year %>%
+  filter(Year %in% (1851:1910)) %>%
+  group_by(federal.region, Party) %>%
+  summarise(Count = n()) %>%
+  arrange((federal.region), desc(Count)))
+
+fed.region.third <- (senators.year %>%
+  filter(Year %in% (1911:1970)) %>%
+  group_by(federal.region, Party) %>%
+  summarise(Count = n()) %>%
+  arrange((federal.region), desc(Count)))
+
+fed.region.fourth <- (senators.year %>%
+  filter(Year %in% (1971:2019)) %>%
+  group_by(federal.region, Party) %>%
+  summarise(Count = n()) %>%
+  arrange((federal.region), desc(Count)))
+```
+
+# US Senate, 1970-2019
+
+```{r}
+recent.senate.party <- (senators.year %>%
+  filter(Year %in% c(1970:2019)) %>%
+  filter(Party %in% c("Republican", "Democratic")) %>%
+  group_by(State, Party) %>%
+  summarise(Percentage = n()/100) %>%
+  #summarise(Democratic = length(senators.year$Party == "Democratic")/(senators.year$Party == "Republican")) %>%
+  arrange(State, Party))
+
+recent.senate.party <- spread(recent.senate.party, Party, Percentage)
+
+#summarise(total_flights = sum(Freq), percentage = sum(Freq)/sum(subset(flights, Airline == 'ALASKA')$Freq))
+#cities_amwest, `San Diego` = `San Diego`/sum(subset(flights, Airline == 'AM WEST' & Arrival_City == "San Diego")$Freq))
+```
+
+
+# Predicting the 2030 Senate
+
+```{r}
+current.senate.party <- (senators.year %>%
+  filter(Year %in% c(1970:2019)) %>%
+  filter(Party %in% c("Republican", "Democratic")) %>%
+  group_by(Year, State, Party) %>%
+  summarise(Count = n()) %>%
+  #summarise(Democratic = length(senators.year$Party == "Democratic")/(senators.year$Party == "Republican")) %>%
+  arrange(Year, State, Party))
+
+current.senate.party <- spread(current.senate.party, Party, Count)
+
+for (i in 1:nrow(current.senate.party)){
+  if (is.na(current.senate.party$Democratic[[i]])){
+    current.senate.party$Democratic[[i]] <- 0
+  }
+  else if (is.na(current.senate.party$Republican[[i]])){
+    current.senate.party$Republican[[i]] <- 0
+  }
+}
+```
+
+# The Current Senate breakdown
+
+```{r}
+senators.current <- read.csv("data/all_current_senators.csv")
+
+senators.professions <- data.frame("test", 0)
+colnames(senators.professions) <- c("Industry", "Count")
+
+law <- data.frame("Law", sum(senators.current$Lawyer))
+colnames(law) <- c("Industry", "Count")
+senators.professions <- rbind(senators.professions, law)
+
+education <- data.frame("Education", sum(senators.current$Education))
+colnames(education) <- c("Industry", "Count")
+senators.professions <- rbind(senators.professions, education)
+
+business <- data.frame("Business", sum(senators.current$Business))
+colnames(business) <- c("Industry", "Count")
+senators.professions <- rbind(senators.professions, business)
+
+military <- data.frame("Military", sum(senators.current$Military))
+colnames(military) <- c("Industry", "Count")
+senators.professions <- rbind(senators.professions, military)
+
+nonprofit <- data.frame("Nonprofit", sum(senators.current$Nonprofit))
+colnames(nonprofit) <- c("Industry", "Count")
+senators.professions <- rbind(senators.professions, nonprofit)
+
+politics <- data.frame("Politics", sum(senators.current$Nonprofit))
+colnames(politics) <- c("Industry", "Count")
+senators.professions <- rbind(senators.professions, politics)
+
+medicine <- data.frame("Medicine", sum(senators.current$Medicine))
+colnames(medicine) <- c("Industry", "Count")
+senators.professions <- rbind(senators.professions, medicine)
+
+senators.professions <- senators.professions[-1,]
+
+ggplot(data = senators.professions, aes(x=reorder(Industry, -Count), y=Count)) +
+  geom_bar(stat = "identity") +
+  xlab("Previous Industry") +
+  ggtitle("Previous Industries of Current US Senators")
+```
